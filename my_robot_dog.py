@@ -6,6 +6,7 @@ from viam.components.base import Base, Vector3
 import socket
 import sys
 
+# Edit the path depending on where you stored these
 sys.path.append("/home/fido/.local/lib/python3.9/site-packages")
 
 
