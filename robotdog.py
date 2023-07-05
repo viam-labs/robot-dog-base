@@ -37,6 +37,13 @@ class robotdog(Base, Reconfigurable):
             raise Exception("A some_pin must be defined")
         return
 
+    # Define a way to send commands to the robot dog server
+    def send_data(self, data):
+        try:
+            self.client_socket.send(data.encode("utf-8"))
+        except Exception as e:
+            print(e)
+
     # Handles attribute reconfiguration
     def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
         # here we initialize the resource instance, the following is just an example and should be updated as needed
@@ -63,11 +70,9 @@ class robotdog(Base, Reconfigurable):
         velocity = velocity * conversion_factor
 
         if velocity > 0:
-            self.position += distance
             command = "CMD_MOVE_FORWARD#" + str(velocity) + "\n"
             self.send_data(command)
         else:
-            self.position -= distance
             command = "CMD_MOVE_BACKWARD#" + str(velocity) + "\n"
             self.send_data(command)
 
@@ -148,6 +153,15 @@ class robotdog(Base, Reconfigurable):
 
     
     async def set_velocity(
+        self,
+        linear: Vector3,
+        angular: Vector3,
+        *,
+        extra: Optional[Dict[str, Any]] = None,
+        timeout: Optional[float] = None,
+        **kwargs,
+    ):
+
         self.linear_vel = linear
         self.angular_vel = angular
 
@@ -204,15 +218,19 @@ class robotdog(Base, Reconfigurable):
         return False
 
     
-    async def get_properties(self, *, timeout: Optional[float] = None, **kwargs) -> Properties:
+    async def get_properties(
+        self,
+        *,
+        timeout: Optional[float] = None,
+        **kwargs
+    ):
         """
         Get the base width and turning radius
 
         Returns:
             Properties: The properties of the base
         """
-        return properties{
-            width_meters: 0.1,
-            turning_radius_meters: 0.0
-        }
-
+        return properties(
+            width_meters = 0.1,
+            turning_radius_meters = 0.0
+        )
