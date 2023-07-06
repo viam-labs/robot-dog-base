@@ -15,7 +15,7 @@ class RobotDog(Base):
     # Subclass the Viam base component and implement the required functions
     def __init__(self, name: str):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect(("10.0.0.144", 5001))
+        self.client_socket.connect(("PASTE DOG IP ADDRESS HERE", 5001))
         # Per the Freenove code, 5001 is for sending/receiving instructions. Port 8001 is used for video.
         super().__init__(name)
 
