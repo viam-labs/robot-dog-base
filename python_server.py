@@ -1,3 +1,5 @@
+# DEPRECATED; we now recommend using robotdog.py, configured as a modular resource,
+# rather than using this server implementation.
 # Python SDK server for the custom base component
 import sys
 import time
