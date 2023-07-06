@@ -12,14 +12,16 @@ from viam.logging import getLogger
 
 import time
 import asyncio
+import socket
 
 LOGGER = getLogger(__name__)
 
 class robotdog(Base, Reconfigurable):
     MODEL: ClassVar[Model] = Model(ModelFamily("viamlabs", "base"), "robotdog")
     
-    # create any class parameters here, 'some_pin' is used as an example (change/add as needed)
-    some_pin: int
+    # Class parameters
+    ip_address: str
+    port: int
 
     # Constructor
     @classmethod
@@ -31,10 +33,15 @@ class robotdog(Base, Reconfigurable):
     # Validates JSON Configuration
     @classmethod
     def validate(cls, config: ComponentConfig):
-        # here we validate config, the following is just an example and should be updated as needed
-        some_pin = config.attributes.fields["some_pin"].number_value
-        if some_pin == "":
-            raise Exception("A some_pin must be defined")
+        # Here we validate config, ensuring that an IP address was provided
+        ip_address = config.attributes.fields["ip_address"].string_value
+        if ip_address == "":
+            raise ValueError("No IP address provided")
+
+        port = int(config.attributes.fields["port"].number_value)
+        # Per the Freenove code, 5001 is for sending/receiving instructions. Port 8001 is used for video.
+        if port == "":
+            port = 5001
         return
 
     # Define a way to send commands to the robot dog server
@@ -42,12 +49,15 @@ class robotdog(Base, Reconfigurable):
         try:
             self.client_socket.send(data.encode("utf-8"))
         except Exception as e:
-            print(e)
+            LOGGER.error(e)
 
     # Handles attribute reconfiguration
     def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
-        # here we initialize the resource instance, the following is just an example and should be updated as needed
-        self.some_pin = int(config.attributes.fields["some_pin"].number_value)
+        # Here we initialize the resource instance
+        ip_address = config.attributes.fields["ip_address"].string_value
+        port = int(config.attributes.fields["port"].number_value)
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect((ip_address, port))
         return
 
     """ Implement the methods the Viam RDK defines for the Base API (rdk:components:base) """
