@@ -1,4 +1,5 @@
-# Custom base implementation for quadruped robot dog
+# Custom base implementation for quadruped robot dog, as a server.
+# DEPRECATED; we now recommend using robotdog.py, configured as a modular resource, instead.
 
 import time
 from typing import Any, Dict, Optional
